@@ -1,0 +1,68 @@
+{
+  "data": [
+    {
+      "user_first_name": "Sachin Kumar",
+      "user_second_name": "Tiwari",
+      "user_address": "Janta Bazar",
+      "user_city": "Chapra",
+      "user_state": "Bihar",
+      "user_zip_code": "841224",
+      "user_phone_no": "7903809668",
+      "user_ssn": "123-45-6789",
+      "user_base_name": "Sachin121111@",
+      "user_password": "Sachin306@",
+      "user_confirm_password": "Sachin306@",
+      "send_money": "10000",
+      "payee_name": "Sachin_Tiwari",
+      "Account_number": "12345678",
+      "Confirm_account_number": "12345678",
+      "Transfer_Account": "100000",
+      "Payee_contact_details": "9887125284",
+      "contact_email_name":"st9420907@gmail.com",
+      "message": "Hi There i want my money back",
+      "loan_amount": "1000",
+      "down_payment": "12",
+      "high_amount_loan": "1000000",
+      "phoneNumber": "7903809668",
+      "accountNumber": "15342",
+      "amount": "1000",
+      "accountId": "17673"
+    },
+
+
+    {
+      "user_first_name": "Rajni Kumari",
+      "user_second_name": "Tiwari",
+      "user_address": "Janta Bazar",
+      "user_city": "Chapra",
+      "user_state": "Bihar",
+      "user_zip_code": "841224",
+      "user_phone_no": "7351223572",
+      "user_ssn": "123-45-6789",
+      "user_base_name": "SRajni731@",
+      "user_password": "Sachin306@",
+      "user_confirm_password": "Sachin306@"
+    }
+
+  ],
+
+
+  "login_data": [
+    {
+      "user_name_1": "SRajni731@",
+      "user_password": "Sachin306@"
+    },
+    {
+      "user_name_1": "Sachin121111@",
+      "user_password": "Sachin306@"
+    }
+  ],
+  "Wrong_credentials":
+          [
+            {
+              "wrong_username":"sa112232@",
+              "wrong_password": "Sachin306@"
+
+            }
+          ]
+}

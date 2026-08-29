@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Account Transactions for Month and Type",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "description": "Unique transaction identifier"
+      },
+      "accountId": {
+        "type": "integer",
+        "description": "Account ID associated with this transaction"
+      },
+      "type": {
+        "type": "string",
+        "enum": ["Credit", "Debit"],
+        "description": "Transaction type"
+      },
+      "date": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Date and time of the transaction in ISO 8601 format"
+      },
+      "amount": {
+        "type": "number",
+        "description": "Transaction amount"
+      },
+      "description": {
+        "type": "string",
+        "description": "Details about the transaction"
+      }
+    },
+    "required": ["id", "accountId", "type", "date", "amount", "description"]
+  }
+}

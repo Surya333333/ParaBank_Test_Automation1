@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Customer Schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Unique customer ID"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "Customer's first name"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Customer's last name"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string",
+          "description": "Street address"
+        },
+        "city": {
+          "type": "string",
+          "description": "City name"
+        },
+        "state": {
+          "type": "string",
+          "description": "State name or abbreviation"
+        },
+        "zipCode": {
+          "type": "string",
+          "description": "Postal code"
+        }
+      },
+      "required": ["street", "city", "state", "zipCode"]
+    },
+    "phoneNumber": {
+      "type": "string",
+      "description": "Customer phone number (can be empty)"
+    },
+    "ssn": {
+      "type": "string",
+      "description": "Customer's SSN (Social Security Number)"
+    }
+  },
+  "required": ["id", "firstName", "lastName", "address", "ssn"]
+}

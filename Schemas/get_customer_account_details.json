@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "customerId": {
+        "type": "integer"
+      },
+      "type": {
+        "type": "string",
+        "enum": ["CHECKING", "SAVINGS", "LOAN", "CREDIT"]
+      },
+      "balance": {
+        "type": "number"
+      }
+    },
+    "required": ["id", "customerId", "type", "balance"]
+  }
+}

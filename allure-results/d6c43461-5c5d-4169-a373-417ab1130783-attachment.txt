@@ -1,0 +1,2 @@
+Response Status  200
+Response Body: {"id":12767,"firstName":"Nguyen","lastName":"Van A","address":{"street":"123 Le Loi","city":"Ha Noi","state":"Ha Noi","zipCode":"100000"},"phoneNumber":"0987654321","ssn":"12345"}

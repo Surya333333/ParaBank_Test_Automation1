@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bill Pay Response Schema",
+  "type": "object",
+  "properties": {
+    "payeeName": {
+      "type": "string",
+      "description": "Name of the payee to whom payment was made"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Amount paid"
+    },
+    "accountId": {
+      "type": "integer",
+      "description": "Account ID from which payment was made"
+    }
+  },
+  "required": ["payeeName", "amount", "accountId"]
+}

@@ -1,0 +1,3 @@
+Status Code: 200
+
+Response Body: Successfully withdrew $122.00 from account #13899

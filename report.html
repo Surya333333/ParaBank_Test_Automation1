@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title id="head-title">report.html</title>
+      <style type="text/css">body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+  color: #999;
+}
+
+h1 {
+  font-size: 24px;
+  color: black;
+}
+
+h2 {
+  font-size: 16px;
+  color: black;
+}
+
+p {
+  color: black;
+}
+
+a {
+  color: #999;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+#environment td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  vertical-align: top;
+}
+#environment tr:nth-child(odd) {
+  background-color: #f6f6f6;
+}
+#environment ul {
+  margin: 0;
+  padding: 0 20px;
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed,
+.passed .col-result {
+  color: green;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: orange;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: red;
+}
+
+.col-links__extra {
+  margin-right: 3px;
+}
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+#results-table {
+  border: 1px solid #e6e6e6;
+  color: #999;
+  font-size: 12px;
+  width: 100%;
+}
+#results-table th,
+#results-table td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  text-align: left;
+}
+#results-table th {
+  font-weight: bold;
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+.logwrapper {
+  max-height: 230px;
+  overflow-y: scroll;
+  background-color: #e6e6e6;
+}
+.logwrapper.expanded {
+  max-height: none;
+}
+.logwrapper.expanded .logexpander:after {
+  content: "collapse [-]";
+}
+.logwrapper .logexpander {
+  z-index: 1;
+  position: sticky;
+  top: 10px;
+  width: max-content;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin: 10px 0 10px calc(100% - 80px);
+  cursor: pointer;
+  background-color: #e6e6e6;
+}
+.logwrapper .logexpander:after {
+  content: "expand [+]";
+}
+.logwrapper .logexpander:hover {
+  color: #000;
+  border-color: #000;
+}
+.logwrapper .log {
+  min-height: 40px;
+  position: relative;
+  top: -50px;
+  height: calc(100% + 50px);
+  border: 1px solid #e6e6e6;
+  color: black;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  padding: 5px;
+  padding-right: 80px;
+  white-space: pre-wrap;
+}
+
+div.media {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin: 0 5px;
+  overflow: hidden;
+  width: 320px;
+}
+
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
+  align-items: center;
+  flex: 1 1;
+  overflow: hidden;
+  height: 200px;
+}
+
+.media-container--fullscreen {
+  grid-template-columns: 0px auto 0px;
+}
+
+.media-container__nav--right,
+.media-container__nav--left {
+  text-align: center;
+  cursor: pointer;
+}
+
+.media-container__viewport {
+  cursor: pointer;
+  text-align: center;
+  height: inherit;
+}
+.media-container__viewport img,
+.media-container__viewport video {
+  object-fit: cover;
+  width: 100%;
+  max-height: 100%;
+}
+
+.media__name,
+.media__counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
+}
+
+.collapsible td:not(.col-links) {
+  cursor: pointer;
+}
+.collapsible td:not(.col-links):hover::after {
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.col-result {
+  width: 130px;
+}
+.col-result:hover::after {
+  content: " (hide details)";
+}
+
+.col-result.collapsed:hover::after {
+  content: " (show details)";
+}
+
+#environment-header h2:hover::after {
+  content: " (hide details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#environment-header.collapsed h2:hover::after {
+  content: " (show details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.sortable {
+  cursor: pointer;
+}
+.sortable.desc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: -12.5px;
+  border: 10px solid #4caf50;
+  border-bottom: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.sortable.asc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: 12.5px;
+  border: 10px solid #4caf50;
+  border-top: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+
+.hidden, .summary__reload__button.hidden {
+  display: none;
+}
+
+.summary__data {
+  flex: 0 0 550px;
+}
+.summary__reload {
+  flex: 1 1;
+  display: flex;
+  justify-content: center;
+}
+.summary__reload__button {
+  flex: 0 0 300px;
+  display: flex;
+  color: white;
+  font-weight: bold;
+  background-color: #4caf50;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.summary__reload__button:hover {
+  background-color: #46a049;
+}
+.summary__spacer {
+  flex: 0 0 550px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.filters,
+.collapse {
+  display: flex;
+  align-items: center;
+}
+.filters button,
+.collapse button {
+  color: #999;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.filters button:hover,
+.collapse button:hover {
+  color: #ccc;
+}
+
+.filter__label {
+  margin-right: 10px;
+}
+
+      </style>
+    
+  </head>
+  <body>
+    <h1 id="title">report.html</h1>
+    <p>Report generated on 29-Aug-2026 at 08:43:27 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
+        v4.2.0</p>
+    <div id="environment-header">
+      <h2>Environment</h2>
+    </div>
+    <table id="environment"></table>
+    <!-- TEMPLATES -->
+      <template id="template_environment_row">
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+    <template id="template_results-table__body--empty">
+      <tbody class="results-table-row">
+        <tr id="not-found-message">
+          <td colspan="4">No results found. Check the filters.</td>
+        </tr>
+      </tbody>
+    </template>
+    <template id="template_results-table__tbody">
+      <tbody class="results-table-row">
+        <tr class="collapsible">
+        </tr>
+        <tr class="extras-row">
+          <td class="extra" colspan="4">
+            <div class="extraHTML"></div>
+            <div class="media">
+              <div class="media-container">
+                  <div class="media-container__nav--left">&lt;</div>
+                  <div class="media-container__viewport">
+                    <img src="" />
+                    <video controls>
+                      <source src="" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="media-container__nav--right">&gt;</div>
+                </div>
+                <div class="media__name"></div>
+                <div class="media__counter"></div>
+            </div>
+            <div class="logwrapper">
+              <div class="logexpander"></div>
+              <div class="log"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </template>
+    <!-- END TEMPLATES -->
+    <div class="summary">
+      <div class="summary__data">
+        <h2>Summary</h2>
+        <div class="additional-summary prefix">
+        </div>
+        <p class="run-count">37 tests took 00:06:32.</p>
+        <p class="filter">(Un)check the boxes to filter the results.</p>
+        <div class="summary__reload">
+          <div class="summary__reload__button hidden" onclick="location.reload()">
+            <div>There are still tests running. <br />Reload this page to get the latest results!</div>
+          </div>
+        </div>
+        <div class="summary__spacer"></div>
+        <div class="controls">
+          <div class="filters">
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="failed" >
+            <span class="failed">20 Failed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="passed" >
+            <span class="passed">17 Passed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="skipped" disabled>
+            <span class="skipped">0 Skipped,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xfailed" disabled>
+            <span class="xfailed">0 Expected failures,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xpassed" disabled>
+            <span class="xpassed">0 Unexpected passes,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="error" >
+            <span class="error">1 Errors,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="rerun" disabled>
+            <span class="rerun">0 Reruns</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="retried" disabled>
+            <span class="retried">0 Retried,</span>
+          </div>
+          <div class="collapse">
+            <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
+          </div>
+        </div>
+      </div>
+      <div class="additional-summary summary">
+      </div>
+      <div class="additional-summary postfix">
+      </div>
+    </div>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable" data-column-type="result">Result</th>
+          <th class="sortable" data-column-type="testId">Test</th>
+          <th class="sortable" data-column-type="duration">Duration</th>
+          <th>Links</th>
+        </tr>
+      </thead>
+    </table>
+  <footer>
+    <div id="data-container" data-jsonblob="{&#34;environment&#34;: {&#34;Python&#34;: &#34;3.14.7&#34;, &#34;Platform&#34;: &#34;Windows-11-10.0.26200-SP0&#34;, &#34;Packages&#34;: {&#34;pytest&#34;: &#34;9.1.1&#34;, &#34;pluggy&#34;: &#34;1.6.0&#34;}, &#34;Plugins&#34;: {&#34;allure-pytest&#34;: &#34;2.16.0&#34;, &#34;html&#34;: &#34;4.2.0&#34;, &#34;metadata&#34;: &#34;3.1.1&#34;}}, &#34;tests&#34;: {&#34;Tests/API_Testing/GET_TESTING/test_Create_transactions_by_amount_for_account.py::test_accountNumber&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/GET_TESTING/test_Create_transactions_by_amount_for_account.py::test_accountNumber&#34;, &#34;duration&#34;: &#34;00:00:02&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/GET_TESTING/test_Create_transactions_by_amount_for_account.py::test_accountNumber&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:02&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;----------------------------- Captured stdout call -----------------------------\nStatus Code: 200\nResponse Body: []\n Empty list \u2014 no transactions found, skipping schema validation.\n&#34;}], &#34;Tests/API_Testing/GET_TESTING/test_accountID.py::test_account_number&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/GET_TESTING/test_accountID.py::test_account_number&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/GET_TESTING/test_accountID.py::test_account_number&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_account_number():\n        account_number = 14454\n        response = AccountIDAPI.get_account_by_id(account_number)\n    \n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;Response Body:&amp;quot;, response.text)\n    \n&amp;gt;       assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\nE       AssertionError: Expected 200, got 400\nE       assert 400 == 200\nE        +  where 400 = &amp;lt;Response [400]&amp;gt;.status_code\n\nTests\\API_Testing\\GET_TESTING\\test_accountID.py:13: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 400\nResponse Body: Could not find account #14454\n&#34;}], &#34;Tests/API_Testing/GET_TESTING/test_accountID_Transaction.py::test_transaction&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/GET_TESTING/test_accountID_Transaction.py::test_transaction&#34;, &#34;duration&#34;: &#34;475 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/GET_TESTING/test_accountID_Transaction.py::test_transaction&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;475 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_transaction():\n        account_number = 14454\n        response = ACCOUNT_TRANSACTION.accountID_Trans(account_number)\n    \n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;Response Body:&amp;quot;, response.text)\n    \n&amp;gt;       assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\nE       AssertionError: Expected 200, got 400\nE       assert 400 == 200\nE        +  where 400 = &amp;lt;Response [400]&amp;gt;.status_code\n\nTests\\API_Testing\\GET_TESTING\\test_accountID_Transaction.py:13: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 400\nResponse Body: Could not find transactions for account #14454\n&#34;}], &#34;Tests/API_Testing/GET_TESTING/test_customerID.py::test_accountNumber&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/GET_TESTING/test_customerID.py::test_accountNumber&#34;, &#34;duration&#34;: &#34;473 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/GET_TESTING/test_customerID.py::test_accountNumber&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;473 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;@pytest.mark.smoke\n    def test_accountNumber():\n        customer_number = 60386\n        response = customerID.customer_id(customer_number)\n    \n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;Response Body:&amp;quot;, response.text)\n    \n&amp;gt;       assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\nE       AssertionError: Expected 200, got 400\nE       assert 400 == 200\nE        +  where 400 = &amp;lt;Response [400]&amp;gt;.status_code\n\nTests\\API_Testing\\GET_TESTING\\test_customerID.py:14: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 400\nResponse Body: Could not find customer #60386\n&#34;}], &#34;Tests/API_Testing/GET_TESTING/test_fetch_transactions_for_a_specfic_date_for_account.py::test_Fetch_transactions_for_a_specfic_date_for_account&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/GET_TESTING/test_fetch_transactions_for_a_specfic_date_for_account.py::test_Fetch_transactions_for_a_specfic_date_for_account&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/GET_TESTING/test_fetch_transactions_for_a_specfic_date_for_account.py::test_Fetch_transactions_for_a_specfic_date_for_account&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;----------------------------- Captured stdout call -----------------------------\nStatus Code: 200\nResponse Body: []\n\u26a0\ufe0f Empty list \u2014 no transactions found, skipping schema validation.\n&#34;}], &#34;Tests/API_Testing/GET_TESTING/test_get_customer_accounts_details.py::test_customer_account_details&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/GET_TESTING/test_get_customer_accounts_details.py::test_customer_account_details&#34;, &#34;duration&#34;: &#34;474 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/GET_TESTING/test_get_customer_accounts_details.py::test_customer_account_details&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;474 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;@pytest.mark.smoke\n    def test_customer_account_details():\n        Customer_id = 12767\n    \n        response = get_account_details.user_account_details(Customer_id = Customer_id)\n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;Response Body:&amp;quot;, response.text)\n    \n&amp;gt;       assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\nE       AssertionError: Expected 200, got 400\nE       assert 400 == 200\nE        +  where 400 = &amp;lt;Response [400]&amp;gt;.status_code\n\nTests\\API_Testing\\GET_TESTING\\test_get_customer_accounts_details.py:14: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 400\nResponse Body: Could not find customer #12767\n&#34;}], &#34;Tests/API_Testing/GET_TESTING/test_get_customer_details_by_customer_id.py::test_get_customer_details_by_customer_id&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/GET_TESTING/test_get_customer_details_by_customer_id.py::test_get_customer_details_by_customer_id&#34;, &#34;duration&#34;: &#34;465 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/GET_TESTING/test_get_customer_details_by_customer_id.py::test_get_customer_details_by_customer_id&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;465 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;@pytest.mark.smoke\n    def test_get_customer_details_by_customer_id():\n        Customer_id = 12767\n    \n        response = get_user_details_by_customer_id.get_user_details(Customer_id = Customer_id)\n        print(&amp;quot;Response Status &amp;quot;,response.status_code)\n        print(&amp;quot;Response Body:&amp;quot;, response.text)\n    \n&amp;gt;       assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\nE       AssertionError: Expected 200, got 400\nE       assert 400 == 200\nE        +  where 400 = &amp;lt;Response [400]&amp;gt;.status_code\n\nTests\\API_Testing\\GET_TESTING\\test_get_customer_details_by_customer_id.py:16: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nResponse Status  400\nResponse Body: Could not find customer #12767\n&#34;}], &#34;Tests/API_Testing/GET_TESTING/test_transaction_by_month_and_account.py::test_transaction_by_month_and_account&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/GET_TESTING/test_transaction_by_month_and_account.py::test_transaction_by_month_and_account&#34;, &#34;duration&#34;: &#34;465 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/GET_TESTING/test_transaction_by_month_and_account.py::test_transaction_by_month_and_account&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;465 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;----------------------------- Captured stdout call -----------------------------\nStatus Code: 200\nResponse Body: []\n\u26a0\ufe0f Empty list \u2014 no transactions found, skipping schema validation.\nBUG-101 : API timeout in transfer funds \n&#34;}], &#34;Tests/API_Testing/GET_TESTING/test_transaction_for_date_range.py::test_Transaction_for_date&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/GET_TESTING/test_transaction_for_date_range.py::test_Transaction_for_date&#34;, &#34;duration&#34;: &#34;449 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/GET_TESTING/test_transaction_for_date_range.py::test_Transaction_for_date&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;449 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;----------------------------- Captured stdout call -----------------------------\n\u26a0\ufe0f Empty list \u2014 no transactions found, skipping schema validation.\n&#34;}], &#34;Tests/API_Testing/POST_TESTING/test_bill_pay.py::test_bill_pay&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/POST_TESTING/test_bill_pay.py::test_bill_pay&#34;, &#34;duration&#34;: &#34;509 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/POST_TESTING/test_bill_pay.py::test_bill_pay&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;509 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;@pytest.mark.smoke\n    def test_bill_pay():\n        user_data = payloads.load_test_data()\n        payload = payloads.build_customer_payload(user_data)\n    \n        response = BILL_PAY.bill_pay_response(payload, account_id=13899, amount=122.00)\n    \n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;Response Body:&amp;quot;, response.text)\n&amp;gt;       assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\nE       AssertionError: Expected 200, got 500\nE       assert 500 == 200\nE        +  where 500 = &amp;lt;Response [500]&amp;gt;.status_code\n\nTests\\API_Testing\\POST_TESTING\\test_bill_pay.py:16: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 500\nResponse Body: \n\r\n\n\n&amp;lt;!-- &amp;lt;!DOCTYPE html PUBLIC &amp;quot;-//W3C//DTD XHTML 1.0 Transitional//EN&amp;quot; &amp;quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&amp;quot;&amp;gt;\n&amp;lt;html xmlns=&amp;quot;http://www.w3.org/1999/xhtml&amp;quot;&amp;gt;\n --&amp;gt;\n&amp;lt;!DOCTYPE html&amp;gt;\n&amp;lt;html&amp;gt;\n\t&amp;lt;head&amp;gt;\n\t\t&amp;lt;meta charset=&amp;quot;UTF-8&amp;quot;&amp;gt;\n\t\t&amp;lt;meta http-equiv=&amp;quot;Content-Type&amp;quot; content=&amp;quot;text/html; charset=UTF-8&amp;quot; /&amp;gt;\n\t\t&amp;lt;title&amp;gt;ParaBank | Error&amp;lt;/title&amp;gt;\n\t\t&amp;lt;link href=&amp;quot;template.css;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot; rel=&amp;quot;stylesheet&amp;quot;\n\t\t\ttype=&amp;quot;text/css&amp;quot; /&amp;gt;\n\t\t&amp;lt;link href=&amp;quot;style.css;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot; rel=&amp;quot;stylesheet&amp;quot;\n\t\t\ttype=&amp;quot;text/css&amp;quot; /&amp;gt;\n\t\t&amp;lt;script src=&amp;quot;webjars/jquery/4.0.0/jquery.min.js;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;\n\t&amp;lt;/head&amp;gt;\n\n\t&amp;lt;body\n\t\t\n\t    onload=&amp;quot;document.login.username.focus();&amp;quot;\n\t  &amp;gt;\n\t\t&amp;lt;div id=&amp;quot;mainPanel&amp;quot;&amp;gt;\n\t\t\t\n\t\t\t\t\n\t\t\t\t\t\r\n\r\n\r\n\r\n&amp;lt;div id=&amp;quot;topPanel&amp;quot;&amp;gt;\r\n  &amp;lt;a href=&amp;quot;admin.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;&amp;lt;img src=&amp;quot;images/clear.gif;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot; width=&amp;quot;56&amp;quot; height=&amp;quot;42&amp;quot; border=&amp;quot;0&amp;quot; class=&amp;quot;admin&amp;quot;/&amp;gt;&amp;lt;/a&amp;gt;\r\n  &amp;lt;a href=&amp;quot;index.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;&amp;lt;img src=&amp;quot;images/logo.gif;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot; alt=&amp;quot;ParaBank&amp;quot; width=&amp;quot;136&amp;quot; height=&amp;quot;31&amp;quot; border=&amp;quot;0&amp;quot; class=&amp;quot;logo&amp;quot; title=&amp;quot;ParaBank&amp;quot;/&amp;gt;&amp;lt;/a&amp;gt;\r\n  &amp;lt;p class=&amp;quot;caption&amp;quot;&amp;gt;Experience the difference&amp;lt;/p&amp;gt;\r\n&amp;lt;/div&amp;gt;\r\n&amp;lt;div id=&amp;quot;headerPanel&amp;quot; style=&amp;quot;background: url(images/header-main.jpg;jsessionid=7E38738B1A245816BCA662D33E8E8497) 0 0 no-repeat;&amp;quot;&amp;gt;\r\n  \r\n\r\n\r\n&amp;lt;ul class=&amp;quot;leftmenu&amp;quot;&amp;gt;\r\n  &amp;lt;li class=&amp;quot;Solutions&amp;quot;&amp;gt;Solutions&amp;lt;/li&amp;gt;\r\n  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;about.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;About Us&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;services.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;Services&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;http://www.parasoft.com/jsp/products.jsp&amp;quot;&amp;gt;Products&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;http://www.parasoft.com/jsp/pr/contacts.jsp&amp;quot;&amp;gt;Locations&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n  &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;admin.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;Admin Page&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n  \r\n&amp;lt;/ul&amp;gt;\r\n  \r\n\r\n\r\n&amp;lt;ul class=&amp;quot;button&amp;quot;&amp;gt;\r\n  &amp;lt;li class=&amp;quot;home&amp;quot;&amp;gt;&amp;lt;a href=&amp;quot;index.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;home&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n  &amp;lt;li class=&amp;quot;aboutus&amp;quot;&amp;gt;&amp;lt;a href=&amp;quot;about.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;about&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n  &amp;lt;li class=&amp;quot;contact&amp;quot;&amp;gt;&amp;lt;a href=&amp;quot;contact.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;contact&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n&amp;lt;/ul&amp;gt;\r\n&amp;lt;/div&amp;gt;\n\t\t\t\t\n\t\t\t\t\n\t\t\t\n\t\t\t&amp;lt;div id=&amp;quot;bodyPanel&amp;quot;&amp;gt;\n\t\t\t\t&amp;lt;div id=&amp;quot;leftPanel&amp;quot;&amp;gt;\n\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\t\t\t\t\r\n\r\n\r\n&amp;lt;h2&amp;gt;Customer Login&amp;lt;/h2&amp;gt;\r\n&amp;lt;div id=&amp;quot;loginPanel&amp;quot;&amp;gt;\r\n  &amp;lt;form name=&amp;quot;login&amp;quot; action=&amp;quot;login.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot; method=&amp;quot;POST&amp;quot;&amp;gt;\r\n    \r\n    &amp;lt;p&amp;gt;&amp;lt;b&amp;gt;Username&amp;lt;/b&amp;gt;&amp;lt;/p&amp;gt;\r\n    &amp;lt;div class=&amp;quot;login&amp;quot;&amp;gt;&amp;lt;input type=&amp;quot;text&amp;quot; class=&amp;quot;input&amp;quot; name=&amp;quot;username&amp;quot;/&amp;gt;&amp;lt;/div&amp;gt;\r\n    &amp;lt;p&amp;gt;&amp;lt;b&amp;gt;Password&amp;lt;/b&amp;gt;&amp;lt;/p&amp;gt;\r\n    &amp;lt;div class=&amp;quot;login&amp;quot;&amp;gt;&amp;lt;input type=&amp;quot;password&amp;quot; class=&amp;quot;input&amp;quot; name=&amp;quot;password&amp;quot;/&amp;gt;&amp;lt;/div&amp;gt;\r\n    &amp;lt;div class=&amp;quot;login&amp;quot;&amp;gt;&amp;lt;input type=&amp;quot;submit&amp;quot; class=&amp;quot;button&amp;quot; value=&amp;quot;Log In&amp;quot;/&amp;gt;&amp;lt;/div&amp;gt;\r\n  &amp;lt;/form&amp;gt;\r\n  &amp;lt;p&amp;gt;&amp;lt;a href=&amp;quot;lookup.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;Forgot login info?&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;\r\n  &amp;lt;p&amp;gt;&amp;lt;a href=&amp;quot;register.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;Register&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;\r\n&amp;lt;/div&amp;gt;\n\t\t\t\t\t\t\n\t\t\t\t\t\t\n\t\t\t\t\t\n\t\t\t\t&amp;lt;/div&amp;gt;\n\t\t\t\t&amp;lt;div id=&amp;quot;rightPanel&amp;quot;&amp;gt;\n\t\t\t\t\t\r\n\r\n\r\n&amp;lt;h1 class=&amp;quot;title&amp;quot;&amp;gt;Error!&amp;lt;/h1&amp;gt;\r\n\r\n\r\n\r\n&amp;lt;p class=&amp;quot;error&amp;quot;&amp;gt;An internal error has occurred and has been logged.&amp;lt;/p&amp;gt;\n\t\t\t\t&amp;lt;/div&amp;gt;\n\t\t\t&amp;lt;/div&amp;gt;\n\t\t&amp;lt;/div&amp;gt;\n\t\t\r\n\r\n\r\n&amp;lt;div id=&amp;quot;footermainPanel&amp;quot;&amp;gt;\r\n  &amp;lt;div id=&amp;quot;footerPanel&amp;quot;&amp;gt;\r\n    &amp;lt;ul&amp;gt;\r\n      &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;index.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;Home&amp;lt;/a&amp;gt;| &amp;lt;/li&amp;gt;\r\n      &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;about.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;About Us&amp;lt;/a&amp;gt;| &amp;lt;/li&amp;gt;\r\n      &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;services.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;Services&amp;lt;/a&amp;gt;| &amp;lt;/li&amp;gt;\r\n      &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;http://www.parasoft.com/jsp/products.jsp&amp;quot;&amp;gt;Products&amp;lt;/a&amp;gt;| &amp;lt;/li&amp;gt;\r\n      &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;http://www.parasoft.com/jsp/pr/contacts.jsp&amp;quot;&amp;gt;Locations&amp;lt;/a&amp;gt;| &amp;lt;/li&amp;gt;\r\n      &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;http://forums.parasoft.com/&amp;quot;&amp;gt;Forum&amp;lt;/a&amp;gt;| &amp;lt;/li&amp;gt;\r\n      &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;sitemap.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;Site Map&amp;lt;/a&amp;gt;| &amp;lt;/li&amp;gt;\r\n      &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;contact.htm;jsessionid=7E38738B1A245816BCA662D33E8E8497&amp;quot;&amp;gt;Contact Us&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n    &amp;lt;/ul&amp;gt;\r\n    &amp;lt;p class=&amp;quot;copyright&amp;quot;&amp;gt;&amp;amp;copy; Parasoft. All rights reserved.&amp;lt;/p&amp;gt;\r\n    &amp;lt;ul class=&amp;quot;visit&amp;quot;&amp;gt;\r\n      &amp;lt;li&amp;gt;Visit us at:&amp;lt;/li&amp;gt;\r\n      &amp;lt;li&amp;gt;&amp;lt;a href=&amp;quot;http://www.parasoft.com/&amp;quot; target=&amp;quot;_blank&amp;quot;&amp;gt;www.parasoft.com&amp;lt;/a&amp;gt;&amp;lt;/li&amp;gt;\r\n    &amp;lt;/ul&amp;gt;\r\n  &amp;lt;/div&amp;gt;\r\n&amp;lt;/div&amp;gt;\n\t&amp;lt;/body&amp;gt;\n&amp;lt;/html&amp;gt;\n\n&#34;}], &#34;Tests/API_Testing/POST_TESTING/test_create_Account.py::test_create_new_account&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/POST_TESTING/test_create_Account.py::test_create_new_account&#34;, &#34;duration&#34;: &#34;476 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/POST_TESTING/test_create_Account.py::test_create_new_account&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;476 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;@pytest.mark.smoke\n    def test_create_new_account():\n        customerId = &amp;quot;12434&amp;quot;\n        newAccountType = &amp;quot;2&amp;quot;\n        fromAccountId = &amp;quot;13899&amp;quot;\n        user_data = payloads.load_test_data()\n        payload = payloads.build_customer_payload(user_data)\n    \n        response = Create_Account.CREATE_ACCOUNT(customerId =customerId, newAccountType= newAccountType, fromAccountId =fromAccountId,payload = payload)\n    \n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;Response Body:&amp;quot;, response.text)\n&amp;gt;       assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\nE       AssertionError: Expected 200, got 400\nE       assert 400 == 200\nE        +  where 400 = &amp;lt;Response [400]&amp;gt;.status_code\n\nTests\\API_Testing\\POST_TESTING\\test_create_Account.py:20: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 400\nResponse Body: Could not create new account for customer 12434 from account 13899\n&#34;}], &#34;Tests/API_Testing/POST_TESTING/test_deposit.py::test_bill_pay&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/POST_TESTING/test_deposit.py::test_bill_pay&#34;, &#34;duration&#34;: &#34;475 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/POST_TESTING/test_deposit.py::test_bill_pay&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;475 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;@pytest.mark.smoke\n    def test_bill_pay():\n        account_id = 13899\n        amount = 122\n        user_data = payloads.load_test_data()\n        payload = payloads.build_customer_payload(user_data)\n        response = DEPOSIT.bill_pay_response(payload, account_id=account_id, amount=amount)\n        #response = post_deposit(payload, account_id=17673, amount=1000)\n    \n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;Response Body:&amp;quot;, response.text)\n&amp;gt;       assert &amp;quot;Successfully deposited&amp;quot; in response.text\nE       AssertionError: assert &amp;#x27;Successfully deposited&amp;#x27; in &amp;#x27;Could not find account number 13899&amp;#x27;\nE        +  where &amp;#x27;Could not find account number 13899&amp;#x27; = &amp;lt;Response [400]&amp;gt;.text\n\nTests\\API_Testing\\POST_TESTING\\test_deposit.py:18: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 400\nResponse Body: Could not find account number 13899\n&#34;}], &#34;Tests/API_Testing/POST_TESTING/test_request_loan.py::test_request_loan&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/POST_TESTING/test_request_loan.py::test_request_loan&#34;, &#34;duration&#34;: &#34;00:00:02&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/POST_TESTING/test_request_loan.py::test_request_loan&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:02&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;@pytest.mark.smoke\n    def test_request_loan():\n    \n        customerId = 12767,\n        amount = 122,\n        downPayment = 2,\n        fromAccountId = 14232\n        user_data = payloads.load_test_data()  # you can also pass an index if you want: load_test_data(0)\n    \n        #  Build the payload from the loaded data\n        payload = payloads.build_customer_payload(user_data)\n    \n        #  Call API Client function\n        response = REQUEST_LOAN.request_loan_by_user(payload,customerId = customerId,amount=amount,downPayment =downPayment, fromAccountId=fromAccountId)\n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;Response Body:&amp;quot;, response.text)\n        assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\n    \n        response_json = response.json()\n    \n        # Load schema\n        with open(&amp;quot;Schemas/request_loan.json&amp;quot;) as f:\n            schema = json.load(f)\n    \n        # Validate against schema (only if non-empty)\n        if response_json:\n&amp;gt;           validate(instance=response_json, schema=schema)\n\nTests\\API_Testing\\POST_TESTING\\test_request_loan.py:33: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ninstance = {&amp;#x27;responseDate&amp;#x27;: 1787972830604, &amp;#x27;loanProviderName&amp;#x27;: &amp;#x27;Wealth Securities Dynamic Loans (WSDL)&amp;#x27;, &amp;#x27;approved&amp;#x27;: False, &amp;#x27;message&amp;#x27;: &amp;#x27;error.insufficient.funds.for.down.payment&amp;#x27;, ...}\nschema = {&amp;#x27;$schema&amp;#x27;: &amp;#x27;https://json-schema.org/draft/2020-12/schema&amp;#x27;, &amp;#x27;title&amp;#x27;: &amp;#x27;Loan Response Schema&amp;#x27;, &amp;#x27;type&amp;#x27;: &amp;#x27;object&amp;#x27;, &amp;#x27;proper...: {&amp;#x27;type&amp;#x27;: &amp;#x27;string&amp;#x27;, &amp;#x27;description&amp;#x27;: &amp;#x27;Additional message related to loan approval or rejection (optional).&amp;#x27;}, ...}, ...}\ncls = &amp;lt;class &amp;#x27;jsonschema.validators.Draft202012Validator&amp;#x27;&amp;gt;, args = (), kwargs = {}\n\n    def validate(instance, schema, cls=None, *args, **kwargs):  # noqa: D417\n        &amp;quot;&amp;quot;&amp;quot;\n        Validate an instance under the given schema.\n    \n            &amp;gt;&amp;gt;&amp;gt; validate([2, 3, 4], {&amp;quot;maxItems&amp;quot;: 2})\n            Traceback (most recent call last):\n                ...\n            ValidationError: [2, 3, 4] is too long\n    \n        :func:`~jsonschema.validators.validate` will first verify that the\n        provided schema is itself valid, since not doing so can lead to less\n        obvious error messages and fail in less obvious or consistent ways.\n    \n        If you know you have a valid schema already, especially\n        if you intend to validate multiple instances with\n        the same schema, you likely would prefer using the\n        `jsonschema.protocols.Validator.validate` method directly on a\n        specific validator (e.g. ``Draft202012Validator.validate``).\n    \n    \n        Arguments:\n    \n            instance:\n    \n                The instance to validate\n    \n            schema:\n    \n                The schema to validate with\n    \n            cls (jsonschema.protocols.Validator):\n    \n                The class that will be used to validate the instance.\n    \n        If the ``cls`` argument is not provided, two things will happen\n        in accordance with the specification. First, if the schema has a\n        :kw:`$schema` keyword containing a known meta-schema [#]_ then the\n        proper validator will be used. The specification recommends that\n        all schemas contain :kw:`$schema` properties for this reason. If no\n        :kw:`$schema` property is found, the default validator class is the\n        latest released draft.\n    \n        Any other provided positional and keyword arguments will be passed\n        on when instantiating the ``cls``.\n    \n        Raises:\n    \n            `jsonschema.exceptions.ValidationError`:\n    \n                if the instance is invalid\n    \n            `jsonschema.exceptions.SchemaError`:\n    \n                if the schema itself is invalid\n    \n        .. rubric:: Footnotes\n        .. [#] known by a validator registered with\n            `jsonschema.validators.validates`\n    \n        &amp;quot;&amp;quot;&amp;quot;\n        if cls is None:\n            cls = validator_for(schema)\n    \n        cls.check_schema(schema)\n        validator = cls(schema, *args, **kwargs)\n        error = exceptions.best_match(validator.iter_errors(instance))\n        if error is not None:\n&amp;gt;           raise error\nE           jsonschema.exceptions.ValidationError: None is not of type &amp;#x27;integer&amp;#x27;\nE           \nE           Failed validating &amp;#x27;type&amp;#x27; in schema[&amp;#x27;properties&amp;#x27;][&amp;#x27;accountId&amp;#x27;]:\nE               {&amp;#x27;type&amp;#x27;: &amp;#x27;integer&amp;#x27;,\nE                &amp;#x27;description&amp;#x27;: &amp;#x27;Associated account ID for the approved loan.&amp;#x27;}\nE           \nE           On instance[&amp;#x27;accountId&amp;#x27;]:\nE               None\n\n..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\jsonschema\\validators.py:1332: ValidationError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 200\nResponse Body: {&amp;quot;responseDate&amp;quot;:1787972830604,&amp;quot;loanProviderName&amp;quot;:&amp;quot;Wealth Securities Dynamic Loans (WSDL)&amp;quot;,&amp;quot;approved&amp;quot;:false,&amp;quot;message&amp;quot;:&amp;quot;error.insufficient.funds.for.down.payment&amp;quot;,&amp;quot;accountId&amp;quot;:null}\n&#34;}], &#34;Tests/API_Testing/POST_TESTING/test_transfer_amount.py::test_post_transfer_amount&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/POST_TESTING/test_transfer_amount.py::test_post_transfer_amount&#34;, &#34;duration&#34;: &#34;487 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/POST_TESTING/test_transfer_amount.py::test_post_transfer_amount&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;487 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;@pytest.mark.smoke\n    def test_post_transfer_amount():\n        fromAccount_Id = 13899,\n        toAccount_Id = 16119,\n        amount = 122003.00\n        #  Load data from JSON file (returns dictionary)\n        user_data = payloads.load_test_data()  # you can also pass an index if you want: load_test_data(0)\n    \n        #  Build the payload from the loaded data\n        payload = payloads.build_customer_payload(user_data)\n    \n        #  Call API Client function\n        response = TRANSFER_AMOUNT.user_transfer_amount(payload,from_account_id=fromAccount_Id,to_account_id=toAccount_Id, amount=amount)\n    \n    \n        #  Debug + Assertion\n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;\\nResponse Body:&amp;quot;, response.text)\n&amp;gt;       assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\nE       AssertionError: Expected 200, got 400\nE       assert 400 == 200\nE        +  where 400 = &amp;lt;Response [400]&amp;gt;.status_code\n\nTests\\API_Testing\\POST_TESTING\\test_transfer_amount.py:23: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 400\n\nResponse Body: Could not find account number 13899 and/or 16119\n&#34;}], &#34;Tests/API_Testing/POST_TESTING/test_update_customer_information.py::test_update_customers_details&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/POST_TESTING/test_update_customer_information.py::test_update_customers_details&#34;, &#34;duration&#34;: &#34;482 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/POST_TESTING/test_update_customer_information.py::test_update_customers_details&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;482 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;----------------------------- Captured stdout call -----------------------------\nStatus Code: 200\n\nResponse Body: Successfully updated customer profile\n&#34;}], &#34;Tests/API_Testing/POST_TESTING/test_withdraw_funds.py::test_withdraw_funds&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/API_Testing/POST_TESTING/test_withdraw_funds.py::test_withdraw_funds&#34;, &#34;duration&#34;: &#34;459 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/API_Testing/POST_TESTING/test_withdraw_funds.py::test_withdraw_funds&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;459 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;@pytest.mark.smoke\n    def test_withdraw_funds():\n        accountId = 13899\n        amount = &amp;quot;122.00&amp;quot;\n        user_data = payloads.load_test_data()  # you can also pass an index if you want: load_test_data(0)\n    \n        #  Build the payload from the loaded data\n        payload = payloads.build_customer_payload(user_data)\n        response = post_user_withdraw_funds.POST_withdraw_funds(payload,accountId = accountId ,amount = amount)\n        print(&amp;quot;Status Code:&amp;quot;, response.status_code)\n        print(&amp;quot;\\nResponse Body:&amp;quot;, response.text)\n&amp;gt;       assert response.status_code == 200, f&amp;quot;Expected 200, got {response.status_code}&amp;quot;\nE       AssertionError: Expected 200, got 400\nE       assert 400 == 200\nE        +  where 400 = &amp;lt;Response [400]&amp;gt;.status_code\n\nTests\\API_Testing\\POST_TESTING\\test_withdraw_funds.py:18: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nStatus Code: 400\n\nResponse Body: Could not find account number 13899\n&#34;}], &#34;Tests/Negative_Testing/test_Request_loan_with_high_amount.py::test_Request_Highest_loan&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Error&#34;, &#34;testId&#34;: &#34;Tests/Negative_Testing/test_Request_loan_with_high_amount.py::test_Request_Highest_loan::setup&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Error&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Negative_Testing/test_Request_loan_with_high_amount.py::test_Request_Highest_loan::setup&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;file C:\\Users\\surya\\.vscode\\ParaBank_Test_Automation1\\Tests\\Negative_Testing\\test_Request_loan_with_high_amount.py, line 14\n  @pytest.mark.smoke\n  def test_Request_Highest_loan(browserInstance,creds):\nE       fixture &amp;#x27;creds&amp;#x27; not found\n&amp;gt;       available fixtures: browserInstance, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, extra, extras, include_metadata_in_junit_xml, metadata, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory\n&amp;gt;       use &amp;#x27;pytest --fixtures [testpath]&amp;#x27; for help on them.\n\nC:\\Users\\surya\\.vscode\\ParaBank_Test_Automation1\\Tests\\Negative_Testing\\test_Request_loan_with_high_amount.py:14\n&#34;}], &#34;Tests/Negative_Testing/test_forgot_account_with_new_user.py::test_forgot_account&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Negative_Testing/test_forgot_account_with_new_user.py::test_forgot_account&#34;, &#34;duration&#34;: &#34;00:00:32&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Negative_Testing/test_forgot_account_with_new_user.py::test_forgot_account&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:32&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;Tests/Negative_Testing/test_login_with_wrong_user.py::test_register_user&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Negative_Testing/test_login_with_wrong_user.py::test_register_user&#34;, &#34;duration&#34;: &#34;00:00:12&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Negative_Testing/test_login_with_wrong_user.py::test_register_user&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:12&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;----------------------------- Captured stdout call -----------------------------\nError!\nThe username and password could not be verified.\nError!\nThe username and password could not be verified.\n&#34;}], &#34;Tests/Negative_Testing/test_register_from_misalignment.py::test_register_from_misalignment&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/Negative_Testing/test_register_from_misalignment.py::test_register_from_misalignment&#34;, &#34;duration&#34;: &#34;00:00:08&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Negative_Testing/test_register_from_misalignment.py::test_register_from_misalignment&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:08&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;browserInstance = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;f0524b6390f00d1520004c44ee3771e9&amp;quot;)&amp;gt;\n\n    @pytest.mark.smoke\n    def test_register_from_misalignment(browserInstance):\n        driver = browserInstance\n        driver.get(&amp;quot;https://parabank.parasoft.com/parabank/index.htm&amp;quot;)\n        browserInstance.maximize_window()\n        wrong_alignment = field_misaligned(browserInstance)\n        wrong_alignment .enter_username(user_data[&amp;quot;wrong_username&amp;quot;])\n        wrong_alignment .enter_password(user_data[&amp;quot;wrong_password&amp;quot;])\n        wrong_alignment .click_on_submit()\n        # Verify fields alignment (visual UI check)\n        username_y, password_y = wrong_alignment.get_field_positions()\n&amp;gt;       assert abs(username_y - password_y) &amp;lt; 10, &amp;quot;BUG-102: Field alignment issue on login form&amp;quot;\nE       AssertionError: BUG-102: Field alignment issue on login form\nE       assert 48 &amp;lt; 10\nE        +  where 48 = abs((305 - 353))\n\nTests\\Negative_Testing\\test_register_from_misalignment.py:25: AssertionError\n&#34;}], &#34;Tests/Negative_Testing/test_register_with_existing_user.py::test_register_user&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/Negative_Testing/test_register_with_existing_user.py::test_register_user&#34;, &#34;duration&#34;: &#34;00:00:44&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Negative_Testing/test_register_with_existing_user.py::test_register_user&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:44&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;browserInstance = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;b076f352fa10fe99d07cecb1498db48f&amp;quot;)&amp;gt;\n\n    @pytest.mark.smoke\n    def test_register_user(browserInstance):\n        driver = browserInstance\n        driver.get(&amp;quot;https://parabank.parasoft.com/parabank/index.htm&amp;quot;)\n        browserInstance.maximize_window()\n        login_with_existing_user = existing_user(browserInstance)\n    \n        login_with_existing_user.click_on_register_page()\n        login_with_existing_user.first_name(user_data[&amp;quot;user_first_name&amp;quot;])\n        login_with_existing_user.last_name(user_data[&amp;quot;user_second_name&amp;quot;])\n        login_with_existing_user.address(user_data[&amp;quot;user_address&amp;quot;])\n        login_with_existing_user.city(user_data[&amp;quot;user_city&amp;quot;])\n        login_with_existing_user.state(user_data[&amp;quot;user_state&amp;quot;])\n        login_with_existing_user.zip_code(user_data[&amp;quot;user_zip_code&amp;quot;])\n        login_with_existing_user.phone(user_data[&amp;quot;user_phone_no&amp;quot;])\n        login_with_existing_user.ssn(user_data[&amp;quot;user_ssn&amp;quot;])\n        login_with_existing_user.user_name(user_data[&amp;quot;user_base_name&amp;quot;])\n        login_with_existing_user.password(user_data[&amp;quot;user_password&amp;quot;])\n        login_with_existing_user.confirm_password(user_data[&amp;quot;user_confirm_password&amp;quot;])\n        time.sleep(1)\n        login_with_existing_user.click_register()\n        time.sleep(4)\n        Existing_error_message = f&amp;quot;This username already exists.&amp;quot;\n    \n        # Assertion\n&amp;gt;       existing_welcome_error_message = login_with_existing_user.existing_error_message()\n                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nTests\\Negative_Testing\\test_register_with_existing_user.py:40: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\nPage_Pom\\Negative_POM\\register_with_existing_user.py:63: in existing_error_message\n    return safe_get_text(self.driver,Locators.existing_user_error)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUtils\\selenium_helpers.py:53: in safe_get_text\n    return WebDriverWait(driver, timeout).until(\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nself = &amp;lt;selenium.webdriver.support.wait.WebDriverWait (session=&amp;quot;b076f352fa10fe99d07cecb1498db48f&amp;quot;)&amp;gt;\nmethod = &amp;lt;function presence_of_element_located.&amp;lt;locals&amp;gt;._predicate at 0x000002460326D590&amp;gt;, message = &amp;#x27;&amp;#x27;\n\n    def until(self, method: Callable[[D], Literal[False] | T], message: str = &amp;quot;&amp;quot;) -&amp;gt; T:\n        &amp;quot;&amp;quot;&amp;quot;Wait until the method returns a value that is not False.\n    \n        Calls the method provided with the driver as an argument until the\n        return value does not evaluate to ``False``.\n    \n        Args:\n            method: A callable object that takes a WebDriver instance as an\n                argument.\n            message: Optional message for TimeoutException.\n    \n        Returns:\n            The result of the last call to `method`.\n    \n        Raises:\n            TimeoutException: If &amp;#x27;method&amp;#x27; does not return a truthy value within\n                the WebDriverWait object&amp;#x27;s timeout.\n    \n        Example:\n            &amp;gt;&amp;gt;&amp;gt; from selenium.webdriver.common.by import By\n            &amp;gt;&amp;gt;&amp;gt; from selenium.webdriver.support.wait import WebDriverWait\n            &amp;gt;&amp;gt;&amp;gt; from selenium.webdriver.support import expected_conditions as EC\n            &amp;gt;&amp;gt;&amp;gt;\n            &amp;gt;&amp;gt;&amp;gt; # Wait until an element is visible on the page\n            &amp;gt;&amp;gt;&amp;gt; wait = WebDriverWait(driver, 10)\n            &amp;gt;&amp;gt;&amp;gt; element = wait.until(EC.visibility_of_element_located((By.ID, &amp;quot;exampleId&amp;quot;)))\n            &amp;gt;&amp;gt;&amp;gt; print(element.text)\n        &amp;quot;&amp;quot;&amp;quot;\n        screen = None\n        stacktrace = None\n    \n        end_time = time.monotonic() + self._timeout\n        while True:\n            try:\n                value = method(self._driver)\n                if value:\n                    return value\n            except self._ignored_exceptions as exc:\n                screen = getattr(exc, &amp;quot;screen&amp;quot;, None)\n                stacktrace = getattr(exc, &amp;quot;stacktrace&amp;quot;, None)\n            if time.monotonic() &amp;gt; end_time:\n                break\n            time.sleep(self._poll)\n&amp;gt;       raise TimeoutException(message, screen, stacktrace)\nE       selenium.common.exceptions.TimeoutException: Message: \nE       Stacktrace:\nE       \tchromedriver!GetHandleVerifier [0x7ff79920abb5+151b5]\nE       \tchromedriver!GetHandleVerifier [0x7ff79920ac10+15210]\nE       \tchromedriver!(No symbol) [0x7ff798d35d6d]\nE       \tchromedriver!(No symbol) [0x7ff798d91289]\nE       \tchromedriver!(No symbol) [0x7ff798d9158c]\nE       \tchromedriver!(No symbol) [0x7ff798de2027]\nE       \tchromedriver!(No symbol) [0x7ff798ddec0b]\nE       \tchromedriver!(No symbol) [0x7ff798d837cc]\nE       \tchromedriver!(No symbol) [0x7ff798d846f3]\nE       \tchromedriver!GetHandleVerifier [0x7ff79982b79b+635d9b]\nE       \tchromedriver!GetHandleVerifier [0x7ff799825ac6+6300c6]\nE       \tchromedriver!GetHandleVerifier [0x7ff79984bcee+6562ee]\nE       \tchromedriver!GetHandleVerifier [0x7ff799228ffe+335fe]\nE       \tchromedriver!GetHandleVerifier [0x7ff79923147c+3ba7c]\nE       \tchromedriver!GetHandleVerifier [0x7ff799214d64+1f364]\nE       \tchromedriver!GetHandleVerifier [0x7ff799214ef4+1f4f4]\nE       \tchromedriver!GetHandleVerifier [0x7ff7991f7d97+2397]\nE       \tKERNEL32!BaseThreadInitThunk [0x7ffe0fe2ccb7+17]\nE       \tntdll!RtlUserThreadStart [0x7ffe10f4ad6c+2c]\n\n..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\selenium\\webdriver\\support\\wait.py:121: TimeoutException\n&#34;}], &#34;Tests/Positive_Testing/test_about_us.py::test_about_us&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_about_us.py::test_about_us&#34;, &#34;duration&#34;: &#34;00:00:09&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_about_us.py::test_about_us&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:09&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;Tests/Positive_Testing/test_account_overview.py::test_account_over_view&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_account_overview.py::test_account_over_view&#34;, &#34;duration&#34;: &#34;00:00:09&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_account_overview.py::test_account_over_view&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:09&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;----------------------------- Captured stdout call -----------------------------\nAccounts Overview\nAccount Balance* Available Amount\n*Balance includes deposits that may be subject to holds\n&#34;}], &#34;Tests/Positive_Testing/test_account_overview_check.py::test_account_over_view&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_account_overview_check.py::test_account_over_view&#34;, &#34;duration&#34;: &#34;00:00:21&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_account_overview_check.py::test_account_over_view&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:21&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;----------------------------- Captured stdout call -----------------------------\n&amp;lt;bound method overview_check.user_account_overview of &amp;lt;Page_Pom.Positive_POM.account_overview_check.overview_check object at 0x00000246029234D0&amp;gt;&amp;gt;\n&#34;}], &#34;Tests/Positive_Testing/test_bill_pay.py::test_Bill_Pay&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_bill_pay.py::test_Bill_Pay&#34;, &#34;duration&#34;: &#34;00:00:40&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_bill_pay.py::test_Bill_Pay&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:40&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;----------------------------- Captured stdout call -----------------------------\nSachin_Tiwari\n100000\n&#34;}], &#34;Tests/Positive_Testing/test_checking_account.py::test_register_user&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_checking_account.py::test_register_user&#34;, &#34;duration&#34;: &#34;00:00:09&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_checking_account.py::test_register_user&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:09&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;browserInstance = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;7d398fa291c3e14e6d47885c6e2708b6&amp;quot;)&amp;gt;\n\n    @pytest.mark.smoke\n    def test_register_user(browserInstance):\n        driver = browserInstance\n        driver.get(&amp;quot;https://parabank.parasoft.com/parabank/index.htm&amp;quot;)\n        browserInstance.maximize_window()\n        Login_user_check = Login_user(browserInstance)\n        Login_user_check.enter_login_name(user_data[&amp;quot;user_base_name&amp;quot;])\n        Login_user_check.enter_login_password(user_data[&amp;quot;user_confirm_password&amp;quot;])\n        Login_user_check.click_on_submit_button()\n        checking_account_create = checking_Account(browserInstance)\n        checking_account_create.open_account()\n        account_selection =checking_account_create.select_saving_account()\n&amp;gt;       money_selection = checking_account_create.select_amount()\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nTests\\Positive_Testing\\test_checking_account.py:29: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\nPage_Pom\\Positive_POM\\open_checking_account.py:20: in select_amount\n    return safe_select(self.driver,Locators.money_selection,selected)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUtils\\selenium_helpers.py:67: in safe_select\n    return select.first_selected_option.text\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nself = &amp;lt;selenium.webdriver.support.select.Select object at 0x00000246032B96D0&amp;gt;\n\n    @property\n    def first_selected_option(self) -&amp;gt; WebElement:\n        &amp;quot;&amp;quot;&amp;quot;Return the first selected option or the currently selected option.&amp;quot;&amp;quot;&amp;quot;\n        for opt in self.options:\n            if opt.is_selected():\n                return opt\n&amp;gt;       raise NoSuchElementException(&amp;quot;No options are selected&amp;quot;)\nE       selenium.common.exceptions.NoSuchElementException: Message: No options are selected; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\n..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\selenium\\webdriver\\support\\select.py:60: NoSuchElementException\n&#34;}], &#34;Tests/Positive_Testing/test_contact_us.py::test_contact_us&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_contact_us.py::test_contact_us&#34;, &#34;duration&#34;: &#34;00:00:20&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_contact_us.py::test_contact_us&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:20&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;browserInstance = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;b1d58377fbb621cba3f08d7a06c02149&amp;quot;)&amp;gt;\n\n    @pytest.mark.smoke\n    def test_contact_us(browserInstance):\n        driver = browserInstance\n        browserInstance.get(&amp;quot;https://parabank.parasoft.com/parabank/index.htm&amp;quot;)\n        browserInstance.maximize_window()\n        user_login = Login_user(browserInstance)\n        user_login.enter_login_name(user_data[&amp;quot;user_base_name&amp;quot;])\n        user_login.enter_login_password(user_data[&amp;quot;user_confirm_password&amp;quot;])\n        user_login.click_on_submit_button()\n    \n    \n        fill_contact_us_form = Contact_us(browserInstance)\n        fill_contact_us_form.click_on_contact_us()\n        user_name = fill_contact_us_form.contact_name(user_data[&amp;quot;user_first_name&amp;quot;])\n        fill_contact_us_form.contact_phone(user_data[&amp;quot;user_phone_no&amp;quot;])\n        fill_contact_us_form.contact_email(user_data[&amp;quot;contact_email_name&amp;quot;])\n        fill_contact_us_form.contact_message(user_data[&amp;quot;message&amp;quot;])\n        fill_contact_us_form.submit_button()\n        time.sleep(10)\n&amp;gt;       console_message = fill_contact_us_form.message()\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       KeyError: &amp;#x27;welcome_note&amp;#x27;\n\nTests\\Positive_Testing\\test_contact_us.py:32: KeyError\n&#34;}], &#34;Tests/Positive_Testing/test_forgot_account.py::test_forgot_account&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_forgot_account.py::test_forgot_account&#34;, &#34;duration&#34;: &#34;00:00:12&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_forgot_account.py::test_forgot_account&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:12&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;browserInstance = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;87c038de36c18ed4dd5621b0c131733c&amp;quot;)&amp;gt;\n\n    @pytest.mark.smoke\n    def test_forgot_account(browserInstance):\n        driver = browserInstance\n        driver.get(&amp;quot;https://parabank.parasoft.com/parabank/index.htm&amp;quot;)\n        browserInstance.maximize_window()\n        user_forgot_network = forgot_account(browserInstance)\n        user_forgot_network.click_on_forgot()\n        user_forgot_network.first_name(user_data[&amp;quot;user_first_name&amp;quot;])\n        user_forgot_network.last_name(user_data[&amp;quot;user_second_name&amp;quot;])\n        user_forgot_network.forgot_address(user_data[&amp;quot;user_address&amp;quot;])\n        user_forgot_network.city(user_data[&amp;quot;user_city&amp;quot;])\n        user_forgot_network.forgot_state(user_data[&amp;quot;user_state&amp;quot;])\n        user_forgot_network.zip_code(user_data[&amp;quot;user_zip_code&amp;quot;])\n        user_forgot_network.forgot_ssn(user_data[&amp;quot;user_ssn&amp;quot;])\n        user_forgot_network.forgot_button()\n        time.sleep(3)\n        compare = user_forgot_network.right_panel()\n        welcome_message = f&amp;quot;Customer Lookup \\nYour login information was located successfully. You are now logged in.\\n Username: parasoft\\n Password: demo&amp;quot;\n        print(compare)\n    \n&amp;gt;       assert compare.strip() == welcome_message.strip(), \\\n                f&amp;quot;Expected &amp;#x27;{compare}&amp;#x27; but got: &amp;#x27;{welcome_message}&amp;#x27;&amp;quot;\nE       AssertionError: Expected &amp;#x27;Error!\nE         The customer information provided could not be found.&amp;#x27; but got: &amp;#x27;Customer Lookup \nE         Your login information was located successfully. You are now logged in.\nE          Username: parasoft\nE          Password: demo&amp;#x27;\nE       assert &amp;#x27;Error!\\nThe ...not be found.&amp;#x27; == &amp;#x27;Customer Loo...assword: demo&amp;#x27;\nE         \nE         + Error!\nE         + The customer information provided could not be found.\nE         - Customer Lookup \nE         - Your login information was located successfully. You are now logged in.\nE         -  Username: parasoft\nE         -  Password: demo\n\nTests\\Positive_Testing\\test_forgot_account.py:36: AssertionError\n\n----------------------------- Captured stdout call -----------------------------\nError!\nThe customer information provided could not be found.\n&#34;}], &#34;Tests/Positive_Testing/test_login.py::test_login_user[creds0]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_login.py::test_login_user[creds0]&#34;, &#34;duration&#34;: &#34;00:00:11&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_login.py::test_login_user[creds0]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:11&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;Tests/Positive_Testing/test_login.py::test_login_user[creds1]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_login.py::test_login_user[creds1]&#34;, &#34;duration&#34;: &#34;00:00:11&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_login.py::test_login_user[creds1]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:11&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;Tests/Positive_Testing/test_login_in_incognito.py::test_login_in_incognito&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_login_in_incognito.py::test_login_in_incognito&#34;, &#34;duration&#34;: &#34;00:00:19&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_login_in_incognito.py::test_login_in_incognito&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:19&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;Tests/Positive_Testing/test_login_with_enter_key.py::test_login_with_enter_key&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_login_with_enter_key.py::test_login_with_enter_key&#34;, &#34;duration&#34;: &#34;00:00:08&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_login_with_enter_key.py::test_login_with_enter_key&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:08&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;Tests/Positive_Testing/test_logout.py::test_logout&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_logout.py::test_logout&#34;, &#34;duration&#34;: &#34;00:00:38&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_logout.py::test_logout&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:38&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;browserInstance = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;99d18ee822a34a18fd8a08ab6c51318f&amp;quot;)&amp;gt;\n\n    @pytest.mark.smoke\n    def test_logout(browserInstance):\n        driver = browserInstance\n        browserInstance.get(&amp;quot;https://parabank.parasoft.com/parabank/index.htm&amp;quot;)\n        browserInstance.maximize_window()\n        login_user_to_check_for_logout = Login_user(browserInstance)\n        login_user_to_check_for_logout.enter_login_name(user_data[&amp;quot;user_base_name&amp;quot;])\n        login_user_to_check_for_logout.enter_login_password(user_data[&amp;quot;user_confirm_password&amp;quot;])\n        login_user_to_check_for_logout.click_on_submit_button\n        logout_user = Logout(browserInstance)\n&amp;gt;       logout_user.logout()\n\nTests\\Positive_Testing\\test_logout.py:23: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\nPage_Pom\\Positive_POM\\logout.py:10: in logout\n    safe_click(self.driver,Locators.logout_button)\nUtils\\selenium_helpers.py:36: in safe_click\n    WebDriverWait(driver, timeout).until(\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nself = &amp;lt;selenium.webdriver.support.wait.WebDriverWait (session=&amp;quot;99d18ee822a34a18fd8a08ab6c51318f&amp;quot;)&amp;gt;\nmethod = &amp;lt;function element_to_be_clickable.&amp;lt;locals&amp;gt;._predicate at 0x000002460326DDD0&amp;gt;, message = &amp;#x27;&amp;#x27;\n\n    def until(self, method: Callable[[D], Literal[False] | T], message: str = &amp;quot;&amp;quot;) -&amp;gt; T:\n        &amp;quot;&amp;quot;&amp;quot;Wait until the method returns a value that is not False.\n    \n        Calls the method provided with the driver as an argument until the\n        return value does not evaluate to ``False``.\n    \n        Args:\n            method: A callable object that takes a WebDriver instance as an\n                argument.\n            message: Optional message for TimeoutException.\n    \n        Returns:\n            The result of the last call to `method`.\n    \n        Raises:\n            TimeoutException: If &amp;#x27;method&amp;#x27; does not return a truthy value within\n                the WebDriverWait object&amp;#x27;s timeout.\n    \n        Example:\n            &amp;gt;&amp;gt;&amp;gt; from selenium.webdriver.common.by import By\n            &amp;gt;&amp;gt;&amp;gt; from selenium.webdriver.support.wait import WebDriverWait\n            &amp;gt;&amp;gt;&amp;gt; from selenium.webdriver.support import expected_conditions as EC\n            &amp;gt;&amp;gt;&amp;gt;\n            &amp;gt;&amp;gt;&amp;gt; # Wait until an element is visible on the page\n            &amp;gt;&amp;gt;&amp;gt; wait = WebDriverWait(driver, 10)\n            &amp;gt;&amp;gt;&amp;gt; element = wait.until(EC.visibility_of_element_located((By.ID, &amp;quot;exampleId&amp;quot;)))\n            &amp;gt;&amp;gt;&amp;gt; print(element.text)\n        &amp;quot;&amp;quot;&amp;quot;\n        screen = None\n        stacktrace = None\n    \n        end_time = time.monotonic() + self._timeout\n        while True:\n            try:\n                value = method(self._driver)\n                if value:\n                    return value\n            except self._ignored_exceptions as exc:\n                screen = getattr(exc, &amp;quot;screen&amp;quot;, None)\n                stacktrace = getattr(exc, &amp;quot;stacktrace&amp;quot;, None)\n            if time.monotonic() &amp;gt; end_time:\n                break\n            time.sleep(self._poll)\n&amp;gt;       raise TimeoutException(message, screen, stacktrace)\nE       selenium.common.exceptions.TimeoutException: Message: \nE       Stacktrace:\nE       \tchromedriver!GetHandleVerifier [0x7ff79920abb5+151b5]\nE       \tchromedriver!GetHandleVerifier [0x7ff79920ac10+15210]\nE       \tchromedriver!(No symbol) [0x7ff798d35d6d]\nE       \tchromedriver!(No symbol) [0x7ff798d91289]\nE       \tchromedriver!(No symbol) [0x7ff798d9158c]\nE       \tchromedriver!(No symbol) [0x7ff798de2027]\nE       \tchromedriver!(No symbol) [0x7ff798ddec0b]\nE       \tchromedriver!(No symbol) [0x7ff798d837cc]\nE       \tchromedriver!(No symbol) [0x7ff798d846f3]\nE       \tchromedriver!GetHandleVerifier [0x7ff79982b79b+635d9b]\nE       \tchromedriver!GetHandleVerifier [0x7ff799825ac6+6300c6]\nE       \tchromedriver!GetHandleVerifier [0x7ff79984bcee+6562ee]\nE       \tchromedriver!GetHandleVerifier [0x7ff799228ffe+335fe]\nE       \tchromedriver!GetHandleVerifier [0x7ff79923147c+3ba7c]\nE       \tchromedriver!GetHandleVerifier [0x7ff799214d64+1f364]\nE       \tchromedriver!GetHandleVerifier [0x7ff799214ef4+1f4f4]\nE       \tchromedriver!GetHandleVerifier [0x7ff7991f7d97+2397]\nE       \tKERNEL32!BaseThreadInitThunk [0x7ffe0fe2ccb7+17]\nE       \tntdll!RtlUserThreadStart [0x7ffe10f4ad6c+2c]\n\n..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\selenium\\webdriver\\support\\wait.py:121: TimeoutException\n&#34;}], &#34;Tests/Positive_Testing/test_open_saving_account.py::test_register_user&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_open_saving_account.py::test_register_user&#34;, &#34;duration&#34;: &#34;00:00:19&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_open_saving_account.py::test_register_user&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:19&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;Tests/Positive_Testing/test_register.py::test_register_user[Sachin121111@]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_register.py::test_register_user[Sachin121111@]&#34;, &#34;duration&#34;: &#34;00:00:14&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_register.py::test_register_user[Sachin121111@]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:14&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;browserInstance = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;c1e7d92ee9b70ddb3081d003d8cc1cf5&amp;quot;)&amp;gt;\ndata = {&amp;#x27;user_first_name&amp;#x27;: &amp;#x27;Sachin Kumar&amp;#x27;, &amp;#x27;user_second_name&amp;#x27;: &amp;#x27;Tiwari&amp;#x27;, &amp;#x27;user_address&amp;#x27;: &amp;#x27;Janta Bazar&amp;#x27;, &amp;#x27;user_city&amp;#x27;: &amp;#x27;Chapra&amp;#x27;, ...}\n\n    @pytest.mark.parametrize(\n        &amp;quot;data&amp;quot;,\n        test_list,   # this comes from test_data[&amp;quot;data&amp;quot;]\n        ids=[d[&amp;quot;user_base_name&amp;quot;] for d in test_list]\n    )\n    @pytest.mark.smoke\n    @pytest.mark.parametrized\n    def test_register_user(browserInstance,data):\n        driver = browserInstance\n        driver.get(&amp;quot;https://parabank.parasoft.com/parabank/index.htm&amp;quot;)\n        browserInstance.maximize_window()\n        registration = Register(browserInstance)\n        registration.click_on_register_page()\n        unique_username = f&amp;quot;{data[&amp;#x27;user_base_name&amp;#x27;]}&amp;quot; #_{int(time.time())}\n        registration.first_name(data[&amp;quot;user_first_name&amp;quot;])\n        registration.last_name(data[&amp;quot;user_second_name&amp;quot;])\n        registration.address(data[&amp;quot;user_address&amp;quot;])\n        registration.city(data[&amp;quot;user_city&amp;quot;])\n        registration.state(data[&amp;quot;user_state&amp;quot;])\n        registration.zip_code(data[&amp;quot;user_zip_code&amp;quot;])\n        registration.phone(data[&amp;quot;user_phone_no&amp;quot;])\n        registration.ssn(data[&amp;quot;user_ssn&amp;quot;])\n        registration.user_name(unique_username)\n        registration.password(data[&amp;quot;user_password&amp;quot;])\n        registration.confirm_password(data[&amp;quot;user_confirm_password&amp;quot;])\n        time.sleep(1)\n        registration.click_register()\n        time.sleep(4)\n        # Build expected welcome text dynamically\n        expected_text = (\n            f&amp;quot;Welcome {unique_username}\\nYour account was created successfully. You are now logged in.&amp;quot;\n        )\n        # Assertion\n        welcome_message = registration.welcome_note()\n&amp;gt;       assert welcome_message.strip() == expected_text.strip(), \\\n            f&amp;quot;Expected &amp;#x27;{expected_text}&amp;#x27; but got: &amp;#x27;{welcome_message}&amp;#x27;&amp;quot;\nE       AssertionError: Expected &amp;#x27;Welcome Sachin121111@\nE         Your account was created successfully. You are now logged in.&amp;#x27; but got: &amp;#x27;Signing up is easy!\nE         If you have an account with us you can sign-up for free instant online access. You will have to provide some personal information.\nE         First Name:\nE         Last Name:\nE         Address:\nE         City:\nE         State:\nE         Zip Code:\nE         Phone #:\nE         SSN:\nE           Username: This username already exists.\nE         Password:\nE         Confirm:\nE          &amp;#x27;\nE       assert &amp;#x27;Signing up i...rd:\\nConfirm:&amp;#x27; == &amp;#x27;Welcome Sach...ow logged in.&amp;#x27;\nE         \nE         - Welcome Sachin121111@\nE         - Your account was created successfully. You are now logged in.\nE         + Signing up is easy!\nE         + If you have an account with us you can sign-up for free instant online access. You will have to provide some personal information.\nE         + First Name:\nE         + Last Name:...\nE         \nE         ...Full output truncated (9 lines hidden), use &amp;#x27;-vv&amp;#x27; to show\n\nTests\\Positive_Testing\\test_register.py:49: AssertionError\n&#34;}], &#34;Tests/Positive_Testing/test_register.py::test_register_user[SRajni731@]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_register.py::test_register_user[SRajni731@]&#34;, &#34;duration&#34;: &#34;00:00:14&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_register.py::test_register_user[SRajni731@]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:14&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;browserInstance = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;199bcca2eb460ea45aa97294b1689a79&amp;quot;)&amp;gt;\ndata = {&amp;#x27;user_first_name&amp;#x27;: &amp;#x27;Rajni Kumari&amp;#x27;, &amp;#x27;user_second_name&amp;#x27;: &amp;#x27;Tiwari&amp;#x27;, &amp;#x27;user_address&amp;#x27;: &amp;#x27;Janta Bazar&amp;#x27;, &amp;#x27;user_city&amp;#x27;: &amp;#x27;Chapra&amp;#x27;, ...}\n\n    @pytest.mark.parametrize(\n        &amp;quot;data&amp;quot;,\n        test_list,   # this comes from test_data[&amp;quot;data&amp;quot;]\n        ids=[d[&amp;quot;user_base_name&amp;quot;] for d in test_list]\n    )\n    @pytest.mark.smoke\n    @pytest.mark.parametrized\n    def test_register_user(browserInstance,data):\n        driver = browserInstance\n        driver.get(&amp;quot;https://parabank.parasoft.com/parabank/index.htm&amp;quot;)\n        browserInstance.maximize_window()\n        registration = Register(browserInstance)\n        registration.click_on_register_page()\n        unique_username = f&amp;quot;{data[&amp;#x27;user_base_name&amp;#x27;]}&amp;quot; #_{int(time.time())}\n        registration.first_name(data[&amp;quot;user_first_name&amp;quot;])\n        registration.last_name(data[&amp;quot;user_second_name&amp;quot;])\n        registration.address(data[&amp;quot;user_address&amp;quot;])\n        registration.city(data[&amp;quot;user_city&amp;quot;])\n        registration.state(data[&amp;quot;user_state&amp;quot;])\n        registration.zip_code(data[&amp;quot;user_zip_code&amp;quot;])\n        registration.phone(data[&amp;quot;user_phone_no&amp;quot;])\n        registration.ssn(data[&amp;quot;user_ssn&amp;quot;])\n        registration.user_name(unique_username)\n        registration.password(data[&amp;quot;user_password&amp;quot;])\n        registration.confirm_password(data[&amp;quot;user_confirm_password&amp;quot;])\n        time.sleep(1)\n        registration.click_register()\n        time.sleep(4)\n        # Build expected welcome text dynamically\n        expected_text = (\n            f&amp;quot;Welcome {unique_username}\\nYour account was created successfully. You are now logged in.&amp;quot;\n        )\n        # Assertion\n        welcome_message = registration.welcome_note()\n&amp;gt;       assert welcome_message.strip() == expected_text.strip(), \\\n            f&amp;quot;Expected &amp;#x27;{expected_text}&amp;#x27; but got: &amp;#x27;{welcome_message}&amp;#x27;&amp;quot;\nE       AssertionError: Expected &amp;#x27;Welcome SRajni731@\nE         Your account was created successfully. You are now logged in.&amp;#x27; but got: &amp;#x27;Signing up is easy!\nE         If you have an account with us you can sign-up for free instant online access. You will have to provide some personal information.\nE         First Name:\nE         Last Name:\nE         Address:\nE         City:\nE         State:\nE         Zip Code:\nE         Phone #:\nE         SSN:\nE           Username: This username already exists.\nE         Password:\nE         Confirm:\nE          &amp;#x27;\nE       assert &amp;#x27;Signing up i...rd:\\nConfirm:&amp;#x27; == &amp;#x27;Welcome SRaj...ow logged in.&amp;#x27;\nE         \nE         - Welcome SRajni731@\nE         - Your account was created successfully. You are now logged in.\nE         + Signing up is easy!\nE         + If you have an account with us you can sign-up for free instant online access. You will have to provide some personal information.\nE         + First Name:\nE         + Last Name:...\nE         \nE         ...Full output truncated (9 lines hidden), use &amp;#x27;-vv&amp;#x27; to show\n\nTests\\Positive_Testing\\test_register.py:49: AssertionError\n&#34;}], &#34;Tests/Positive_Testing/test_request_loan.py::test_Request_loan&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_request_loan.py::test_Request_loan&#34;, &#34;duration&#34;: &#34;00:00:19&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_request_loan.py::test_Request_loan&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:19&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;Tests/Positive_Testing/test_transfer.py::test_transfer&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;Tests/Positive_Testing/test_transfer.py::test_transfer&#34;, &#34;duration&#34;: &#34;00:00:09&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;Tests/Positive_Testing/test_transfer.py::test_transfer&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:09&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;browserInstance = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;4a875dee04b138c73ee7c9ccda749326&amp;quot;)&amp;gt;\n\n    @pytest.mark.smoke\n    def test_transfer(browserInstance):\n        driver = browserInstance\n        browserInstance.get(&amp;quot;https://parabank.parasoft.com/parabank/index.htm&amp;quot;)\n        browserInstance.maximize_window()\n        login_user = Login_user(browserInstance)\n        login_user.enter_login_name(user_data[&amp;quot;user_base_name&amp;quot;])\n        login_user.enter_login_password(user_data[&amp;quot;user_confirm_password&amp;quot;])\n        login_user.click_on_submit_button()\n        transfer_account = transfer(browserInstance)\n        transfer_account.click_on_transfer_button()\n        transfer_account.money_transfer(user_data[&amp;quot;send_money&amp;quot;])\n&amp;gt;       from_acc = transfer_account.from_account()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nTests\\Positive_Testing\\test_transfer.py:27: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\nPage_Pom\\Positive_POM\\transfer_funds.py:20: in from_account\n    return safe_select(self.driver, Locators.from_bank, selected)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUtils\\selenium_helpers.py:67: in safe_select\n    return select.first_selected_option.text\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nself = &amp;lt;selenium.webdriver.support.select.Select object at 0x00000246033296D0&amp;gt;\n\n    @property\n    def first_selected_option(self) -&amp;gt; WebElement:\n        &amp;quot;&amp;quot;&amp;quot;Return the first selected option or the currently selected option.&amp;quot;&amp;quot;&amp;quot;\n        for opt in self.options:\n            if opt.is_selected():\n                return opt\n&amp;gt;       raise NoSuchElementException(&amp;quot;No options are selected&amp;quot;)\nE       selenium.common.exceptions.NoSuchElementException: Message: No options are selected; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception\n\n..\\..\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\selenium\\webdriver\\support\\select.py:60: NoSuchElementException\n&#34;}]}, &#34;renderCollapsed&#34;: [&#34;passed&#34;], &#34;initialSort&#34;: &#34;result&#34;, &#34;title&#34;: &#34;report.html&#34;}"></div>
+    <script>
+      (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const { getCollapsedCategory, setCollapsedIds } = require('./storage.js')
+
+class DataManager {
+    setManager(data) {
+        const collapsedCategories = [...getCollapsedCategory(data.renderCollapsed)]
+        const collapsedIds = []
+        const tests = Object.values(data.tests).flat().map((test, index) => {
+            const collapsed = collapsedCategories.includes(test.result.toLowerCase())
+            const id = `test_${index}`
+            if (collapsed) {
+                collapsedIds.push(id)
+            }
+            return {
+                ...test,
+                id,
+                collapsed,
+            }
+        })
+        const dataBlob = { ...data, tests }
+        this.data = { ...dataBlob }
+        this.renderData = { ...dataBlob }
+        setCollapsedIds(collapsedIds)
+    }
+
+    get allData() {
+        return { ...this.data }
+    }
+
+    resetRender() {
+        this.renderData = { ...this.data }
+    }
+
+    setRender(data) {
+        this.renderData.tests = [...data]
+    }
+
+    toggleCollapsedItem(id) {
+        this.renderData.tests = this.renderData.tests.map((test) =>
+            test.id === id ? { ...test, collapsed: !test.collapsed } : test,
+        )
+    }
+
+    set allCollapsed(collapsed) {
+        this.renderData = { ...this.renderData, tests: [...this.renderData.tests.map((test) => (
+            { ...test, collapsed }
+        ))] }
+    }
+
+    get testSubset() {
+        return [...this.renderData.tests]
+    }
+
+    get environment() {
+        return this.renderData.environment
+    }
+
+    get initialSort() {
+        return this.data.initialSort
+    }
+}
+
+module.exports = {
+    manager: new DataManager(),
+}
+
+},{"./storage.js":8}],2:[function(require,module,exports){
+const mediaViewer = require('./mediaviewer.js')
+const templateEnvRow = document.getElementById('template_environment_row')
+const templateResult = document.getElementById('template_results-table__tbody')
+
+function htmlToElements(html) {
+    const temp = document.createElement('template')
+    temp.innerHTML = html
+    return temp.content.childNodes
+}
+
+const find = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return elem.querySelector(selector)
+}
+
+const findAll = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return [...elem.querySelectorAll(selector)]
+}
+
+const dom = {
+    getStaticRow: (key, value) => {
+        const envRow = templateEnvRow.content.cloneNode(true)
+        const isObj = typeof value === 'object' && value !== null
+        const values = isObj ? Object.keys(value).map((k) => `${k}: ${value[k]}`) : null
+
+        const valuesElement = htmlToElements(
+            values ? `<ul>${values.map((val) => `<li>${val}</li>`).join('')}<ul>` : `<div>${value}</div>`)[0]
+        const td = findAll('td', envRow)
+        td[0].textContent = key
+        td[1].appendChild(valuesElement)
+
+        return envRow
+    },
+    getResultTBody: ({ testId, id, log, extras, resultsTableRow, tableHtml, result, collapsed }) => {
+        const resultBody = templateResult.content.cloneNode(true)
+        resultBody.querySelector('tbody').classList.add(result.toLowerCase())
+        resultBody.querySelector('tbody').id = testId
+        resultBody.querySelector('.collapsible').dataset.id = id
+
+        resultsTableRow.forEach((html) => {
+            const t = document.createElement('template')
+            t.innerHTML = html
+            resultBody.querySelector('.collapsible').appendChild(t.content)
+        })
+
+        if (log) {
+            // Wrap lines starting with "E" with span.error to color those lines red
+            const wrappedLog = log.replace(/^E.*$/gm, (match) => `<span class="error">${match}</span>`)
+            resultBody.querySelector('.log').innerHTML = wrappedLog
+        } else {
+            resultBody.querySelector('.log').remove()
+        }
+
+        if (collapsed) {
+            resultBody.querySelector('.collapsible > .col-result')?.classList.add('collapsed')
+            resultBody.querySelector('.extras-row').classList.add('hidden')
+        } else {
+            resultBody.querySelector('.collapsible > .col-result')?.classList.remove('collapsed')
+        }
+
+        const media = []
+        extras?.forEach(({ name, format_type, content }) => {
+            if (['image', 'video'].includes(format_type)) {
+                media.push({ path: content, name, format_type })
+            }
+
+            if (format_type === 'html') {
+                resultBody.querySelector('.extraHTML').insertAdjacentHTML('beforeend', `<div>${content}</div>`)
+            }
+        })
+        mediaViewer.setup(resultBody, media)
+
+        // Add custom html from the pytest_html_results_table_html hook
+        tableHtml?.forEach((item) => {
+            resultBody.querySelector('td[class="extra"]').insertAdjacentHTML('beforeend', item)
+        })
+
+        return resultBody
+    },
+}
+
+module.exports = {
+    dom,
+    htmlToElements,
+    find,
+    findAll,
+}
+
+},{"./mediaviewer.js":6}],3:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const storageModule = require('./storage.js')
+
+const getFilteredSubSet = (filter) =>
+    manager.allData.tests.filter(({ result }) => filter.includes(result.toLowerCase()))
+
+const doInitFilter = () => {
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+}
+
+const doFilter = (type, show) => {
+    if (show) {
+        storageModule.showCategory(type)
+    } else {
+        storageModule.hideCategory(type)
+    }
+
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+
+    const sortColumn = storageModule.getSort()
+    doSort(sortColumn, true)
+}
+
+module.exports = {
+    doFilter,
+    doInitFilter,
+}
+
+},{"./datamanager.js":1,"./sort.js":7,"./storage.js":8}],4:[function(require,module,exports){
+const { redraw, bindEvents, renderStatic } = require('./main.js')
+const { doInitFilter } = require('./filter.js')
+const { doInitSort } = require('./sort.js')
+const { manager } = require('./datamanager.js')
+const data = JSON.parse(document.getElementById('data-container').dataset.jsonblob)
+
+function init() {
+    manager.setManager(data)
+    doInitFilter()
+    doInitSort()
+    renderStatic()
+    redraw()
+    bindEvents()
+}
+
+init()
+
+},{"./datamanager.js":1,"./filter.js":3,"./main.js":5,"./sort.js":7}],5:[function(require,module,exports){
+const { dom, find, findAll } = require('./dom.js')
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const { doFilter } = require('./filter.js')
+const {
+    getVisible,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    getSortDirection,
+    possibleFilters,
+} = require('./storage.js')
+
+const removeChildren = (node) => {
+    while (node.firstChild) {
+        node.removeChild(node.firstChild)
+    }
+}
+
+const renderStatic = () => {
+    const renderEnvironmentTable = () => {
+        const environment = manager.environment
+        const rows = Object.keys(environment).map((key) => dom.getStaticRow(key, environment[key]))
+        const table = document.getElementById('environment')
+        removeChildren(table)
+        rows.forEach((row) => table.appendChild(row))
+    }
+    renderEnvironmentTable()
+}
+
+const addItemToggleListener = (elem) => {
+    elem.addEventListener('click', ({ target }) => {
+        const id = target.parentElement.dataset.id
+        manager.toggleCollapsedItem(id)
+
+        const collapsedIds = getCollapsedIds()
+        if (collapsedIds.includes(id)) {
+            const updated = collapsedIds.filter((item) => item !== id)
+            setCollapsedIds(updated)
+        } else {
+            collapsedIds.push(id)
+            setCollapsedIds(collapsedIds)
+        }
+        redraw()
+    })
+}
+
+const renderContent = (tests) => {
+    const sortAttr = getSort(manager.initialSort)
+    const sortAsc = JSON.parse(getSortDirection())
+    const rows = tests.map(dom.getResultTBody)
+    const table = document.getElementById('results-table')
+    const tableHeader = document.getElementById('results-table-head')
+
+    const newTable = document.createElement('table')
+    newTable.id = 'results-table'
+
+    // remove all sorting classes and set the relevant
+    findAll('.sortable', tableHeader).forEach((elem) => elem.classList.remove('asc', 'desc'))
+    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
+    newTable.appendChild(tableHeader)
+
+    if (!rows.length) {
+        const emptyTable = document.getElementById('template_results-table__body--empty').content.cloneNode(true)
+        newTable.appendChild(emptyTable)
+    } else {
+        rows.forEach((row) => {
+            if (!!row) {
+                findAll('.collapsible td:not(.col-links', row).forEach(addItemToggleListener)
+                find('.logexpander', row).addEventListener('click',
+                    (evt) => evt.target.parentNode.classList.toggle('expanded'),
+                )
+                newTable.appendChild(row)
+            }
+        })
+    }
+
+    table.replaceWith(newTable)
+}
+
+const renderDerived = () => {
+    const currentFilter = getVisible()
+    possibleFilters.forEach((result) => {
+        const input = document.querySelector(`input[data-test-result="${result}"]`)
+        input.checked = currentFilter.includes(result)
+    })
+}
+
+const bindEvents = () => {
+    const filterColumn = (evt) => {
+        const { target: element } = evt
+        const { testResult } = element.dataset
+
+        doFilter(testResult, element.checked)
+        const collapsedIds = getCollapsedIds()
+        const updated = manager.renderData.tests.map((test) => {
+            return {
+                ...test,
+                collapsed: collapsedIds.includes(test.id),
+            }
+        })
+        manager.setRender(updated)
+        redraw()
+    }
+
+    const header = document.getElementById('environment-header')
+    header.addEventListener('click', () => {
+        const table = document.getElementById('environment')
+        table.classList.toggle('hidden')
+        header.classList.toggle('collapsed')
+    })
+
+    findAll('input[name="filter_checkbox"]').forEach((elem) => {
+        elem.addEventListener('click', filterColumn)
+    })
+
+    findAll('.sortable').forEach((elem) => {
+        elem.addEventListener('click', (evt) => {
+            const { target: element } = evt
+            const { columnType } = element.dataset
+            doSort(columnType)
+            redraw()
+        })
+    })
+
+    document.getElementById('show_all_details').addEventListener('click', () => {
+        manager.allCollapsed = false
+        setCollapsedIds([])
+        redraw()
+    })
+    document.getElementById('hide_all_details').addEventListener('click', () => {
+        manager.allCollapsed = true
+        const allIds = manager.renderData.tests.map((test) => test.id)
+        setCollapsedIds(allIds)
+        redraw()
+    })
+}
+
+const redraw = () => {
+    const { testSubset } = manager
+
+    renderContent(testSubset)
+    renderDerived()
+}
+
+module.exports = {
+    redraw,
+    bindEvents,
+    renderStatic,
+}
+
+},{"./datamanager.js":1,"./dom.js":2,"./filter.js":3,"./sort.js":7,"./storage.js":8}],6:[function(require,module,exports){
+class MediaViewer {
+    constructor(assets) {
+        this.assets = assets
+        this.index = 0
+    }
+
+    nextActive() {
+        this.index = this.index === this.assets.length - 1 ? 0 : this.index + 1
+        return [this.activeFile, this.index]
+    }
+
+    prevActive() {
+        this.index = this.index === 0 ? this.assets.length - 1 : this.index -1
+        return [this.activeFile, this.index]
+    }
+
+    get currentIndex() {
+        return this.index
+    }
+
+    get activeFile() {
+        return this.assets[this.index]
+    }
+}
+
+
+const setup = (resultBody, assets) => {
+    if (!assets.length) {
+        resultBody.querySelector('.media').classList.add('hidden')
+        return
+    }
+
+    const mediaViewer = new MediaViewer(assets)
+    const container = resultBody.querySelector('.media-container')
+    const leftArrow = resultBody.querySelector('.media-container__nav--left')
+    const rightArrow = resultBody.querySelector('.media-container__nav--right')
+    const mediaName = resultBody.querySelector('.media__name')
+    const counter = resultBody.querySelector('.media__counter')
+    const imageEl = resultBody.querySelector('img')
+    const sourceEl = resultBody.querySelector('source')
+    const videoEl = resultBody.querySelector('video')
+
+    const setImg = (media, index) => {
+        if (media?.format_type === 'image') {
+            imageEl.src = media.path
+
+            imageEl.classList.remove('hidden')
+            videoEl.classList.add('hidden')
+        } else if (media?.format_type === 'video') {
+            sourceEl.src = media.path
+
+            videoEl.classList.remove('hidden')
+            imageEl.classList.add('hidden')
+        }
+
+        mediaName.innerText = media?.name
+        counter.innerText = `${index + 1} / ${assets.length}`
+    }
+    setImg(mediaViewer.activeFile, mediaViewer.currentIndex)
+
+    const moveLeft = () => {
+        const [media, index] = mediaViewer.prevActive()
+        setImg(media, index)
+    }
+    const doRight = () => {
+        const [media, index] = mediaViewer.nextActive()
+        setImg(media, index)
+    }
+    const openImg = () => {
+        window.open(mediaViewer.activeFile.path, '_blank')
+    }
+    if (assets.length === 1) {
+        container.classList.add('media-container--fullscreen')
+    } else {
+        leftArrow.addEventListener('click', moveLeft)
+        rightArrow.addEventListener('click', doRight)
+    }
+    imageEl.addEventListener('click', openImg)
+}
+
+module.exports = {
+    setup,
+}
+
+},{}],7:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const storageModule = require('./storage.js')
+
+const genericSort = (list, key, ascending, customOrder) => {
+    let sorted
+    if (customOrder) {
+        sorted = list.sort((a, b) => {
+            const aValue = a.result.toLowerCase()
+            const bValue = b.result.toLowerCase()
+
+            const aIndex = customOrder.findIndex((item) => item.toLowerCase() === aValue)
+            const bIndex = customOrder.findIndex((item) => item.toLowerCase() === bValue)
+
+            // Compare the indices to determine the sort order
+            return aIndex - bIndex
+        })
+    } else {
+        sorted = list.sort((a, b) => a[key] === b[key] ? 0 : a[key] > b[key] ? 1 : -1)
+    }
+
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const durationSort = (list, ascending) => {
+    const parseDuration = (duration) => {
+        if (duration.includes(':')) {
+            // If it's in the format "HH:mm:ss"
+            const [hours, minutes, seconds] = duration.split(':').map(Number)
+            return (hours * 3600 + minutes * 60 + seconds) * 1000
+        } else {
+            // If it's in the format "nnn ms"
+            return parseInt(duration)
+        }
+    }
+    const sorted = list.sort((a, b) => parseDuration(a['duration']) - parseDuration(b['duration']))
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const doInitSort = () => {
+    const type = storageModule.getSort(manager.initialSort)
+    const ascending = storageModule.getSortDirection()
+    const list = manager.testSubset
+    const initialOrder = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed', 'Skipped', 'Passed']
+
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    if (type?.toLowerCase() === 'original') {
+        manager.setRender(list)
+    } else {
+        let sortedList
+        switch (type) {
+        case 'duration':
+            sortedList = durationSort(list, ascending)
+            break
+        case 'result':
+            sortedList = genericSort(list, type, ascending, initialOrder)
+            break
+        default:
+            sortedList = genericSort(list, type, ascending)
+            break
+        }
+        manager.setRender(sortedList)
+    }
+}
+
+const doSort = (type, skipDirection) => {
+    const newSortType = storageModule.getSort(manager.initialSort) !== type
+    const currentAsc = storageModule.getSortDirection()
+    let ascending
+    if (skipDirection) {
+        ascending = currentAsc
+    } else {
+        ascending = newSortType ? false : !currentAsc
+    }
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    const list = manager.testSubset
+    const sortedList = type === 'duration' ? durationSort(list, ascending) : genericSort(list, type, ascending)
+    manager.setRender(sortedList)
+}
+
+module.exports = {
+    doInitSort,
+    doSort,
+}
+
+},{"./datamanager.js":1,"./storage.js":8}],8:[function(require,module,exports){
+const possibleFilters = [
+    'passed',
+    'skipped',
+    'failed',
+    'error',
+    'xfailed',
+    'xpassed',
+    'rerun',
+]
+
+const getVisible = () => {
+    const url = new URL(window.location.href)
+    const settings = new URLSearchParams(url.search).get('visible')
+    const lower = (item) => {
+        const lowerItem = item.toLowerCase()
+        if (possibleFilters.includes(lowerItem)) {
+            return lowerItem
+        }
+        return null
+    }
+    return settings === null ?
+        possibleFilters :
+        [...new Set(settings?.split(',').map(lower).filter((item) => item))]
+}
+
+const hideCategory = (categoryToHide) => {
+    const url = new URL(window.location.href)
+    const visibleParams = new URLSearchParams(url.search).get('visible')
+    const currentVisible = visibleParams ? visibleParams.split(',') : [...possibleFilters]
+    const settings = [...new Set(currentVisible)].filter((f) => f !== categoryToHide).join(',')
+
+    url.searchParams.set('visible', settings)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const showCategory = (categoryToShow) => {
+    if (typeof window === 'undefined') {
+        return
+    }
+    const url = new URL(window.location.href)
+    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',').filter(Boolean) ||
+        [...possibleFilters]
+    const settings = [...new Set([categoryToShow, ...currentVisible])]
+    const noFilter = possibleFilters.length === settings.length || !settings.length
+
+    noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getSort = (initialSort) => {
+    const url = new URL(window.location.href)
+    let sort = new URLSearchParams(url.search).get('sort')
+    if (!sort) {
+        sort = initialSort || 'result'
+    }
+    return sort
+}
+
+const setSort = (type) => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('sort', type)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getCollapsedCategory = (renderCollapsed) => {
+    let categories
+    if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        const collapsedItems = new URLSearchParams(url.search).get('collapsed')
+        switch (true) {
+        case !renderCollapsed && collapsedItems === null:
+            categories = ['passed']
+            break
+        case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
+            categories = []
+            break
+        case /^all$/.test(collapsedItems) || collapsedItems === null && /^all$/.test(renderCollapsed):
+            categories = [...possibleFilters]
+            break
+        default:
+            categories = collapsedItems?.split(',').map((item) => item.toLowerCase()) || renderCollapsed
+            break
+        }
+    } else {
+        categories = []
+    }
+    return categories
+}
+
+const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc')) || false
+const setSortDirection = (ascending) => sessionStorage.setItem('sortAsc', ascending)
+
+const getCollapsedIds = () => JSON.parse(sessionStorage.getItem('collapsedIds')) || []
+const setCollapsedIds = (list) => sessionStorage.setItem('collapsedIds', JSON.stringify(list))
+
+module.exports = {
+    getVisible,
+    hideCategory,
+    showCategory,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    setSort,
+    getSortDirection,
+    setSortDirection,
+    getCollapsedCategory,
+    possibleFilters,
+}
+
+},{}]},{},[4]);
+    </script>
+  </footer>
+  </body>
+</html>

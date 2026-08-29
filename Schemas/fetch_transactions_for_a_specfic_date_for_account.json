@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Account Transactions Response",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "description": "Unique transaction identifier"
+      },
+      "accountId": {
+        "type": "integer",
+        "description": "Account ID associated with this transaction"
+      },
+      "type": {
+        "type": "string",
+        "enum": ["Credit", "Debit"],
+        "description": "Type of transaction (Credit or Debit)"
+      },
+      "date": {
+        "type": ["string", "number"],
+        "description": "Date of the transaction (ISO 8601 format or timestamp)"
+      },
+      "amount": {
+        "type": "number",
+        "description": "Transaction amount"
+      },
+      "description": {
+        "type": "string",
+        "description": "Details or remarks about the transaction"
+      }
+    },
+    "required": ["id", "accountId", "type", "date", "amount", "description"]
+  }
+}

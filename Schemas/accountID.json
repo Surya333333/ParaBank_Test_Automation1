@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Account Schema",
+  "description": "Schema for validating account details API response",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Account ID"
+    },
+    "customerId": {
+      "type": "integer",
+      "description": "Customer ID linked to the account"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["CHECKING", "SAVINGS"],
+      "description": "Account type"
+    },
+    "balance": {
+      "type": "number",
+      "description": "Account balance"
+    }
+  },
+  "required": ["id", "customerId", "type", "balance"]
+}

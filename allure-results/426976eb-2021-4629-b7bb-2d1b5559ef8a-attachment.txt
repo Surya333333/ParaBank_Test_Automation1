@@ -1,0 +1,2 @@
+Status Code: 200
+Response Body: {"id":22002,"customerId":12434,"type":"LOAN","balance":0}

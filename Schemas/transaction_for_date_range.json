@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Transaction By Date Schema",
+  "description": "Schema for validating the response of GET /accounts/{accountId}/transactions/onDate/{onDate}",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "description": "Unique transaction ID"
+      },
+      "accountId": {
+        "type": "integer",
+        "description": "Associated account ID"
+      },
+      "type": {
+        "type": "string",
+        "enum": ["Credit", "Debit"],
+        "description": "Type of transaction"
+      },
+      "date": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Transaction date in ISO format"
+      },
+      "amount": {
+        "type": "number",
+        "description": "Transaction amount"
+      },
+      "description": {
+        "type": "string",
+        "description": "Transaction description"
+      }
+    },
+    "required": ["id", "accountId", "type", "date", "amount", "description"]
+  }
+}

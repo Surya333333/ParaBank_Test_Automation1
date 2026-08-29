@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Loan Response Schema",
+  "type": "object",
+  "properties": {
+    "responseDate": {
+      "type": ["string", "integer"],
+      "description": "Date/time when the loan response was generated. Can be a string (ISO) or epoch timestamp."
+    },
+    "loanProviderName": {
+      "type": "string",
+      "description": "Name of the loan provider."
+    },
+    "approved": {
+      "type": "boolean",
+      "description": "Indicates whether the loan was approved."
+    },
+    "message": {
+      "type": "string",
+      "description": "Additional message related to loan approval or rejection (optional)."
+    },
+    "accountId": {
+      "type": "integer",
+      "description": "Associated account ID for the approved loan."
+    }
+  },
+  "required": ["responseDate", "loanProviderName", "approved", "accountId"]
+}

@@ -1,0 +1,1 @@
+{"uuid": "3de0fb24-cb2c-42c7-a900-5f09a7b40296", "befores": [{"name": "creds", "status": "passed", "start": 1787972326989, "stop": 1787972326989}], "afters": [{"name": "creds::<lambda>", "start": 1787972335280}], "start": 1787972326989, "stop": 1787972335280}

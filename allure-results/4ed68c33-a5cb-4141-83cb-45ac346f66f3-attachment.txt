@@ -1,0 +1,2 @@
+Status Code: 200
+Response Body: {"responseDate":1787972096346,"loanProviderName":"Wealth Securities Dynamic Loans (WSDL)","approved":true,"accountId":22113}

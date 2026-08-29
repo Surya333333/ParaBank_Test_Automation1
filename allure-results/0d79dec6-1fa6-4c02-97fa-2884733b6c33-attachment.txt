@@ -1,0 +1,2 @@
+Status Code: 200
+Response Body: [{"id":13899,"customerId":12767,"type":"CHECKING","balance":515.50}]
